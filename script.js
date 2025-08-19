@@ -3,61 +3,76 @@ const interactions = document.querySelectorAll('.interaction');
 const equal = document.querySelector('#equal');
 const output = document.querySelector('#output');
 let expression = '';
-let currentInput = '';
 let lastInput = '';
 let parts = [];
-let operators = [];
+let nums = [];
+let lastNumber = '';
+let lastSymbol =''
 const specMarks = ['+', '-', '*', '/', '=', '.'];
-const specNums = /[0-9]/;
+const specNums = '0123456789';
 
 function addSymbol(symbol) {
-  lastInput = currentInput;
-  parts = expression.split(/[\+\-\*\/]/); 
-  let lastNumber = parts[parts.length-1];
+  parts = parser(expression); 
+  nums = getNums(expression);
+  lastSymbol = expression.slice(-1)[0];
+  lastInput = parts.slice(-1)[0];
+  nums.length >= 1 ? lastNumber = nums.slice(-1)[0] : lastNumber = '';      
   if (symbol === '=') return;
-  if (expression.length === 0 && ((specMarks.includes(symbol) && symbol !== '-'))) {
-    return;
-  };
-  if ((specMarks.includes(symbol)) && (specMarks.includes(lastInput))) {
-    return;
-  };
-  if (lastNumber === '0' && symbol === '0') return;  
-  if (lastNumber === '0' && (symbol !== '.')) expression = expression.replace(/.$/, '');
-  if (lastNumber.includes('.') && symbol === '.') return;
-  currentInput = symbol;
+  if (!expression && '+*/'.includes(symbol)) return;
+  if (expression === '0' && symbol ==='0') return;
+  if (expression === '0' && specNums.includes(symbol)) expression = expression.replace(/.$/, '');
+  if (expression === '-' && !specNums.includes(symbol)) return;
+  if (lastNumber === '0' && symbol === '0') return;
+  if ('+-*/'.includes(lastSymbol) && specMarks.includes(symbol) && symbol !== '-') return;
+  if (lastSymbol === '.' && !specNums.includes(symbol)) return;
+  if (symbol === '.' && lastNumber.includes('.')) return; 
+  if (lastNumber === '' && symbol === '.') symbol = '0.';
+  if (specMarks.includes(parts[parts.length-2]) && lastSymbol === '-' && symbol === '-') return;
   expression += symbol;
-  output.textContent = expression;
-  parts = expression.split(/[\+\-\*\/]/); 
+  output.textContent = expressionFormat(expression);
 }
 
-function operate(parts, operators) {
-  console.log(operators);
-  operands = parts.reverse();
-  let result = null;
-  for (let i of operators) {
-    let firstOperand = Number(parts.pop());
-    let secondOperand = Number(parts.pop());
-    console.log(i);
-    switch(i) {
-      case '+':
-        result = firstOperand + secondOperand;
-        break;
-      case '-':
-        result = firstOperand - secondOperand;
-        break;
-      case '*' :
-        result = firstOperand * secondOperand;
-        break;
-      case '/' :
-        result = firstOperand / secondOperand;
-        break;
-    };
-    parts.push(result);
-  };
-  result = parts[0];
-  if (result % 1 !== 0) result = Math.round(result * 100_000) / 100_000;
-  console.log(result);
-  return String(result);
+function expressionFormat(expression) {
+  args = parser(expression);
+  let result = ''
+  for (let arg of args) {
+    if (arg.length === 1 && '+-*/'.includes(arg)) {
+      result += ` ${arg} `;
+    } else result += arg;
+  }
+  return result;
+}
+
+function getNums(tokens){
+  let args = parser(tokens);
+  result = args.filter((token) => !isNaN(token));
+  return result;
+}
+
+function parser(expression) {
+  let tokens = [];
+  let num = '';
+  for (let i=0; i<expression.length; i++) {
+    let ch = expression[i];
+    if (specNums.includes(ch)) {
+      num += ch;
+    } else if (ch === '.' && num && !num.includes('.')) {
+      num += ch;
+    } else if ('+-*/'.includes(ch)) {
+      if (num) {
+        tokens.push(num);
+        num = '';
+      }
+
+      if (ch === '-' && (i === 0 || '+-*/'.includes(expression[i-1]))) {
+        num = '-';
+      } else {
+        tokens.push(ch);
+      }
+    }
+  }
+  if (num) tokens.push(num);
+  return(tokens);
 }
 
 
@@ -70,47 +85,81 @@ buttons.forEach(button => {
 
 document.addEventListener('keydown', (e) => {
   let arg = e.key;
-  console.log(e.key);
-  if (arg === 'Enter') {
-    parts = expression.split(/[\+\-\*\/]/); 
-    operators = expression.split(/[0-9\.]/);
-    parts = parts.filter(function (e) { 
-      return e;
-    });
-    operators = operators.filter(function (e) { 
-      return e;
-    });
-    
-    if ((parts.length - operators.length) === 1 && operators.length !== 0) {
-      expression = operate(parts, operators);
-      output.textContent = expression;
-    };
-  };
   if (arg === 'Backspace') {
     expression = expression.replace(/.$/, '');
-    output.textContent = expression;
-    if (!specMarks.includes(currentInput)) parts.pop();
-    currentInput = expression[expression.length-1];
+    output.textContent = expressionFormat(expression);
   };
-  console.log(arg)
-  if (specMarks.includes(arg) || specNums.test(arg)) addSymbol(arg);
+  if (arg === 'Enter') {
+    if (parser(expression).length - getNums(expression).length === getNums(expression).length - 1) {
+      equalEvent();
+    } 
+  }
+  if (specMarks.includes(arg) || specNums.includes(arg)) addSymbol(arg);
 })
 
-equal.addEventListener('click', (e) => {
-  parts = expression.split(/[\+\-\*\/]/); 
-  operators = expression.split(/[0-9\.]/);
+function operate(parts) {
+  let firstOperand = null;
+  let secondOperand = null;
+  let result = null;
+  let specificOperators = parts.reduce((counter, part) => {
+    if ('*/'.includes(part)) counter += 1;
+    return counter;
+  }, 0);
+  for (let i=0; i<specificOperators; i++) {
+    for (let j of parts) {
+      if (!'*/'.includes(j)) continue;
+      firstOperand = Number(parts[parts.indexOf(j)-1]);
+      secondOperand = Number(parts[parts.indexOf(j)+1]);
+      switch(j) {
+        case '*':
+          result = firstOperand * secondOperand;
+          parts.splice(parts.indexOf(j)-1, 3, result);
+          break;
+        case '/' :
+          result = firstOperand / secondOperand;
+          parts.splice(parts.indexOf(j)-1, 3, result);
+          break;
+      }
+      break;
+    }
+  }
+  for (let i=0; i<expression.length-1; i++) {
+    for (let j of parts) {
+      if (!'+-'.includes(j)) continue;
+      firstOperand = Number(parts[parts.indexOf(j)-1]);
+      secondOperand = Number(parts[parts.indexOf(j)+1]);
+      switch(j) {
+        case '+' :
+          result = firstOperand + secondOperand;
+          parts.splice(parts.indexOf(j)-1, 3, result);
+          break;
+        case '-' :
+          result = firstOperand - secondOperand;
+          parts.splice(parts.indexOf(j)-1, 3, result);
+          break;
+      }
+      break;
+    }
+  }
+  return parts;
+}
 
-  parts = parts.filter(function (e) { 
-    return e;
-  });
-  operators = operators.filter(function (e) { 
-    return e;
-  });
-  
-  if ((parts.length - operators.length) === 1 && operators.length !== 0) {
-    expression = operate(parts, operators);
-    output.textContent = expression;
-  };
+function equalEvent() {
+  result = operate(parser(expression))[0];
+  if (result === Infinity || isNaN(result)) {
+    expression = '';
+    output.textContent = 'Error :(';
+    return;
+  }
+  if (result % 1 !== 0) result = (Math.round(result*1000000) / 1000000);
+  expression = String(result);
+  output.textContent = expression;
+}
+
+equal.addEventListener('click', (e) => {
+  if (parser(expression).length - getNums(expression).length === getNums(expression).length - 1) {
+    equalEvent();
+  }
 });
 
 interactions.forEach(interaction => {
@@ -119,16 +168,16 @@ interactions.forEach(interaction => {
     switch(target) {
       case 'AC':
         expression = '';
-        currentInput = '';
         lastInput = '';
-        currentInput = '';
-        output.textContent = '';
+        parts = null;
+        nums = null;
+        lastNumber = '';
+        lastSymbol = '';
+        output.textContent = expression;
         break;
       case 'C':
         expression = expression.replace(/.$/, '');
-        output.textContent = expression;
-        if (!specMarks.includes(currentInput)) parts.pop();
-        currentInput = expression[expression.length-1];
+        output.textContent = expressionFormat(expression);
         break;
     };
   });

@@ -1,8 +1,9 @@
-* {
-    border: 1px solid green;
-}
+
 body {
     background-color: rgb(199, 199, 199);
+    display: flex;
+    justify-content: center;
+    margin: 60px;
 }
 #calculator {
     display: flex;
@@ -17,15 +18,19 @@ body {
     display: flex;
     justify-content: end;
     align-items: end;
-    padding: 6px;
+    background-color: rgb(48, 48, 48);
+    padding: 12px;
     padding-bottom: 0px;
     padding-top: 20px;
     height: 70px;
     font-size: 48px;
+    overflow: hidden;
+    text-wrap: nowrap;
 }
 #keyboard {
     display: flex;
-    font-size: 48px;  
+    font-size: 48px;
+    padding: 16px 0px;
 }
 #enter {
     display: flex;
@@ -36,17 +41,23 @@ body {
     display: flex;
     flex-wrap: wrap;
 }
-.num {
+
+.button {
     display: flex;
-    background-color: rgb(65, 65, 65);
     margin: 6px;
     padding: 12px;
     width: 60px;
     height: 60px;
-    border-radius: 100%;
+    border-radius: 100px;
     justify-content: center;
     align-items: center;
     cursor: pointer;
+}
+.num {
+    background-color: rgb(65, 65, 65);
+}
+.zero {
+    flex: 1;
 }
 #interactions {
     display: flex;
@@ -61,6 +72,7 @@ body {
     border-radius: 100%;
     justify-content: center;
     align-items: center;
+    cursor: pointer;
 }
 
 #operations {
@@ -69,13 +81,5 @@ body {
     font-size: 32px;
 }
 .operator {
-    display: flex;
     background-color: rgb(172, 117, 0);
-    margin: 6px;
-    padding: 12px;
-    width: 60px;
-    height: 60px;
-    border-radius: 100%;
-    justify-content: center;
-    align-items: center;
 }
