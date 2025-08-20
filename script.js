@@ -1,14 +1,15 @@
 const buttons = document.querySelectorAll('.button');
 const interactions = document.querySelectorAll('.interaction');
-const equal = document.querySelector('#equal');
+const equal = document.querySelector('.equal');
 const output = document.querySelector('#output');
+const lastExpression = document.querySelector('#lastExpression');
 let expression = '';
 let lastInput = '';
 let parts = [];
 let nums = [];
 let lastNumber = '';
 let lastSymbol =''
-const specMarks = ['+', '-', '*', '/', '=', '.'];
+const specMarks = ['+', '-', 'x', '÷', '=', '.'];
 const specNums = '0123456789';
 
 function addSymbol(symbol) {
@@ -18,12 +19,12 @@ function addSymbol(symbol) {
   lastInput = parts.slice(-1)[0];
   nums.length >= 1 ? lastNumber = nums.slice(-1)[0] : lastNumber = '';      
   if (symbol === '=') return;
-  if (!expression && '+*/'.includes(symbol)) return;
+  if (!expression && '+x÷'.includes(symbol)) return;
   if (expression === '0' && symbol ==='0') return;
   if (expression === '0' && specNums.includes(symbol)) expression = expression.replace(/.$/, '');
   if (expression === '-' && !specNums.includes(symbol)) return;
   if (lastNumber === '0' && symbol === '0') return;
-  if ('+-*/'.includes(lastSymbol) && specMarks.includes(symbol) && symbol !== '-') return;
+  if ('+-x÷'.includes(lastSymbol) && specMarks.includes(symbol) && symbol !== '-') return;
   if (lastSymbol === '.' && !specNums.includes(symbol)) return;
   if (symbol === '.' && lastNumber.includes('.')) return; 
   if (lastNumber === '' && symbol === '.') symbol = '0.';
@@ -36,7 +37,7 @@ function expressionFormat(expression) {
   args = parser(expression);
   let result = ''
   for (let arg of args) {
-    if (arg.length === 1 && '+-*/'.includes(arg)) {
+    if (arg.length === 1 && '+-x÷'.includes(arg)) {
       result += ` ${arg} `;
     } else result += arg;
   }
@@ -58,13 +59,13 @@ function parser(expression) {
       num += ch;
     } else if (ch === '.' && num && !num.includes('.')) {
       num += ch;
-    } else if ('+-*/'.includes(ch)) {
+    } else if ('+-x÷'.includes(ch)) {
       if (num) {
         tokens.push(num);
         num = '';
       }
 
-      if (ch === '-' && (i === 0 || '+-*/'.includes(expression[i-1]))) {
+      if (ch === '-' && (i === 0 || '+-x÷'.includes(expression[i-1]))) {
         num = '-';
       } else {
         tokens.push(ch);
@@ -93,7 +94,9 @@ document.addEventListener('keydown', (e) => {
     if (parser(expression).length - getNums(expression).length === getNums(expression).length - 1) {
       equalEvent();
     } 
-  }
+  };
+  if (arg === '*') arg = 'x';
+  if (arg === '/') arg = '÷';
   if (specMarks.includes(arg) || specNums.includes(arg)) addSymbol(arg);
 })
 
@@ -102,20 +105,20 @@ function operate(parts) {
   let secondOperand = null;
   let result = null;
   let specificOperators = parts.reduce((counter, part) => {
-    if ('*/'.includes(part)) counter += 1;
+    if ('x÷'.includes(part)) counter += 1;
     return counter;
   }, 0);
   for (let i=0; i<specificOperators; i++) {
     for (let j of parts) {
-      if (!'*/'.includes(j)) continue;
+      if (!'x÷'.includes(j)) continue;
       firstOperand = Number(parts[parts.indexOf(j)-1]);
       secondOperand = Number(parts[parts.indexOf(j)+1]);
       switch(j) {
-        case '*':
+        case 'x':
           result = firstOperand * secondOperand;
           parts.splice(parts.indexOf(j)-1, 3, result);
           break;
-        case '/' :
+        case '÷' :
           result = firstOperand / secondOperand;
           parts.splice(parts.indexOf(j)-1, 3, result);
           break;
@@ -146,6 +149,7 @@ function operate(parts) {
 
 function equalEvent() {
   result = operate(parser(expression))[0];
+  lastExpression.textContent = expressionFormat(expression);
   if (result === Infinity || isNaN(result)) {
     expression = '';
     output.textContent = 'Error :(';
@@ -169,10 +173,11 @@ interactions.forEach(interaction => {
       case 'AC':
         expression = '';
         lastInput = '';
-        parts = null;
-        nums = null;
+        parts = [];
+        nums = [];
         lastNumber = '';
         lastSymbol = '';
+        lastExpression.textContent = '';
         output.textContent = expression;
         break;
       case 'C':

@@ -5,40 +5,73 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="styles.css">
     <script src="script.js" defer></script>
+    <link rel="preconnect" href="https://rsms.me/">
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
     <title>Document</title>
 </head>
 <body>
-    <div id="calculator">
-        <div id="output">
-            79
+    <div id="content">
+        <div id="inner">
+            <div id="aboutThis">
+                <blockquote id="someText" translate="yes">
+                    <p class="title">About this <strong style="color: #c45bdc;">thing</strong></p>
+                    <p class="textContent">
+                        This was a challenging exercise, but it was absolutely worth it. 
+                        It was exciting to finally apply my knowledge in practice.
+                        The calculator follows the rules of mathematics: 
+                        multiplication and division are performed first, 
+                        followed by addition and subtraction.
+                    </p>
+                    <p class="textContent">
+                        Here’s how it works: whenever a button on the calculator (or a key on the keyboard) 
+                        is pressed, the input symbol is validated according to specific rules. 
+                        When the expression is complete and the “=” button is pressed, 
+                        it is parsed into tokens (numbers and operators). The array of tokens is then analyzed: 
+                        if multiplication or division operators are found, the operation is performed on the numbers to the left and right of the operator. 
+                        These three tokens are replaced by the result. After that, the remaining operations are executed.
+                    </p>
+                </blockquote>
+            </div>
+            <div id="calculator">
+                <div id="display">
+                    <div class="cont">
+                        <div class='text' id="lastExpression"></div>
+                        <div class='text' id="output">0</div>
+                    </div>
+                </div>
+                <div id="keyboard">
+                    <div id="enter">
+                        <div id="interactions">
+                            <div id='head' class="interaction">AC</div>
+                            <div id='head' class="button operator">÷</div>
+                            <div id='head' class="button operator">x</div>
+                        </div>
+                        <div id="numbers">
+                            <div id='mainNums'class="button num">7</div>
+                            <div id='mainNums'class="button num">8</div>
+                            <div id='mainNums'class="button num">9</div>
+                            <div id='mainNums'class="button num">4</div>
+                            <div id='mainNums'class="button num">5</div>
+                            <div id='mainNums'class="button num">6</div>
+                            <div id='mainNums'class="button num">1</div>
+                            <div id='mainNums'class="button num">2</div>
+                            <div id='mainNums'class="button num">3</div>
+                            <div id='mainNums'class="button num zero" >0</div>
+                            <div id='mainNums'class="button num">.</div>
+                        </div>
+                    </div>
+                    <div id="operations">
+                        <div id='panel' class="interaction">C</div>
+                        <div id='panel' class="button operator">-</div>
+                        <div id='panel' class="button operator">+</div>
+                        <div id='panel' class="button operator equal">=</div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div id="keyboard">
-            <div id="enter">
-                <div id="numbers">
-                    <div class="button num">7</div>
-                    <div class="button num">8</div>
-                    <div class="button num">9</div>
-                    <div class="button num">4</div>
-                    <div class="button num">5</div>
-                    <div class="button num">6</div>
-                    <div class="button num">1</div>
-                    <div class="button num">2</div>
-                    <div class="button num">3</div>
-                    <div class="button num zero" >0</div>
-                </div>
-                <div id="interactions">
-                    <div class="interaction">AC</div>
-                    <div class="interaction">C</div>
-                    <div class="button num">.</div>
-                </div>
-            </div>
-            <div id="operations">
-                <div class="button operator">+</div>
-                <div class="button operator">-</div>
-                <div class="button operator">*</div>
-                <div class="button operator">/</div>
-                <div id="equal" class="button operator">=</div>
-            </div>
+        <div id="quote">
+            Building this project was a valuable experience that helped me understand 
+            JavaScript much better ❤️
         </div>
     </div>
 </body>
