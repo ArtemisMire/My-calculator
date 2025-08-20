@@ -75,11 +75,13 @@ blockquote {
     gap: 6px
 }
 .text {
+    height: 56px;
     text-align: end;
 }
 #lastExpression {
     opacity: 0.5;
     font-size: 38px;
+    height: 38px;
 }
 
 #keyboard {

@@ -161,7 +161,7 @@ function equalEvent() {
 }
 
 equal.addEventListener('click', (e) => {
-  if (parser(expression).length - getNums(expression).length === getNums(expression).length - 1) {
+  if (parser(expression).length - getNums(expression).length === getNums(expression).length - 1 && parser.length >= 3) {
     equalEvent();
   }
 });
