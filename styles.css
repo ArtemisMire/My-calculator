@@ -1,7 +1,9 @@
 body {
     background-image: linear-gradient(to bottom right, #2f0038,  #eb91ff);
     margin: 0px;
-    overflow-y: hidden;
+    background-repeat: no-repeat;
+    height: 100vh;
+    overflow: hidden;
     font-family: 'Inter';
 }
 
@@ -10,7 +12,7 @@ body {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    margin-top: 60px;
+    margin-top: clamp(20vh, 40vh, 60vh);
 }
 #inner {
     display: flex;
@@ -172,6 +174,6 @@ blockquote {
     font-style: italic;
     margin-top: 0px;
     text-align: center;
-    margin-top: 70px;
+    margin-top: 50px;
     margin-bottom: 60px;
 }
